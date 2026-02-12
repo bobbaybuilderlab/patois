@@ -5,6 +5,8 @@ h2{margin:14px 0 8px 0;font-size:14px;color:#cbd5e1}
 p{margin:0 0 10px 0;color:#94a3b8}
 button{width:100%;padding:10px;border:none;border-radius:10px;background:#22c55e;color:#052e16;font-weight:700;cursor:pointer}
 button.off{background:#38bdf8;color:#082f49}
+button.secondary{background:#1f2937;color:#e2e8f0;margin-top:6px}
+.actions{margin:8px 0 12px}
 .tiny{font-size:12px;color:#64748b;margin-top:8px}
 .stats{list-style:none;padding:0;margin:0;display:grid;gap:6px}
 .stats li{font-size:12px;background:#111827;border:1px solid #1f2937;border-radius:8px;padding:6px 8px;color:#cbd5e1}

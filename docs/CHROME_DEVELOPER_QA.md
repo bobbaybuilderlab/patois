@@ -12,7 +12,7 @@ People who want a fun browsing experience, language/culture enthusiasts, and cre
 No.
 
 ## 4) What permissions are requested and why?
-- `storage`: save toggle + intensity preference.
+- `storage`: save toggle state and local conversion word stats for dictionary growth.
 - `<all_urls>` host permission: needed to read/replace page text on visited sites.
 
 ## 5) What user data do you collect?
@@ -36,8 +36,8 @@ No. Code is bundled in the extension package.
 ## 11) Can users disable the feature?
 Yes, there is an enabled toggle in popup.
 
-## 12) Can users control intensity or behavior?
-Yes, intensity slider in popup (1–3).
+## 12) Can users control behavior?
+Yes. Popup has a simple Convert / Unconvert toggle and users can export local conversion stats as JSON to improve future dictionary entries.
 
 ## 13) Known limitations?
 - Context-aware translation is limited.

@@ -1,6 +1,7 @@
 const toggleBtn = document.getElementById('toggleBtn');
 const statusEl = document.getElementById('status');
 const statsList = document.getElementById('statsList');
+const exportBtn = document.getElementById('exportBtn');
 
 let enabled = true;
 
@@ -45,5 +46,34 @@ toggleBtn.addEventListener('click', async () => {
     type: enabled ? 'PATOIS_APPLY_NOW' : 'PATOIS_REVERT_NOW'
   }, () => {
     statusEl.textContent = enabled ? 'Converted on this tab.' : 'Reverted on this tab.';
+  });
+});
+
+exportBtn.addEventListener('click', () => {
+  chrome.storage.local.get({ convertedStats: {} }, (cfg) => {
+    const stats = cfg.convertedStats || {};
+    const suggestions = Object.entries(stats)
+      .sort((a, b) => b[1] - a[1])
+      .map(([word, count]) => ({
+        englishWord: word,
+        count,
+        suggestedPatois: '',
+        approved: false
+      }));
+
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      totalTrackedWords: suggestions.length,
+      suggestions
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `patois-dictionary-growth-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    statusEl.textContent = 'Exported JSON suggestions.';
   });
 });
