@@ -1,0 +1,10 @@
+body{font-family:Inter,system-ui,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;min-width:320px}
+.card{padding:14px}
+h1{margin:0 0 6px 0;font-size:20px}
+p{margin:0 0 10px 0;color:#94a3b8}
+.row{display:flex;justify-content:space-between;align-items:center;margin:10px 0}
+label{display:block;margin:10px 0;font-size:14px}
+input[type='range']{width:100%}
+button{width:100%;padding:10px;border:none;border-radius:10px;background:#22c55e;color:#052e16;font-weight:700;cursor:pointer}
+.tiny{font-size:12px;color:#64748b}
+#status{margin-top:8px;font-size:12px;color:#22c55e}
