@@ -3,10 +3,10 @@
 Patois is a fun Chrome extension that rewrites visible English text on webpages into Jamaican Patois vibes.
 
 ## Features
-- One-click enable/disable
-- Intensity slider (light → heavy slang)
+- One-button popup: Convert / Unconvert
+- Tracks converted words so the dictionary can expand over time
 - Works on most websites via content script
-- No account, no backend, no tracking
+- No account, no backend, no user tracking
 
 ## Load locally
 1. Open `chrome://extensions`

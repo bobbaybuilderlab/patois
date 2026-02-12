@@ -1,69 +1,22 @@
 const DICTIONARY = {
-  hello: 'wah gwaan',
-  hi: 'wah gwaan',
-  friend: 'fren',
-  friends: 'frens dem',
-  you: 'yuh',
-  your: 'yuh',
-  are: 'a',
-  is: 'a',
-  am: 'mi deh',
-  my: 'mi',
-  very: 'real',
-  really: 'real real',
-  what: 'wah',
-  where: 'weh',
-  why: 'wah mek',
-  this: 'dis',
-  that: 'dat',
-  with: 'wid',
-  for: 'fi',
-  to: 'fi',
-  them: 'dem',
-  those: 'dem deh',
-  going: 'gwaan',
-  good: 'irie',
-  great: 'mad',
-  awesome: 'wicked',
-  amazing: 'tun up',
-  yes: 'yeah man',
-  no: 'nuh',
-  do: 'duh',
-  does: 'duh',
-  did: 'didh',
-  don't: 'nuh',
-  cannot: 'cyan',
-  can: 'can',
-  house: 'yaad',
-  home: 'yaad',
-  food: 'nyam',
-  eat: 'nyam',
-  children: 'pickney dem',
-  child: 'pickney',
-  girl: 'gyal',
-  boy: 'bwoy',
-  people: 'people dem',
-  money: 'peppa',
-  police: 'babylon',
-  quickly: 'quick quick',
-  now: 'now now',
-  later: 'inna likkle while',
-  stop: 'hol up',
-  please: 'mi beg yuh',
-  thanks: 'respek',
-  thank: 'respek',
-  beautiful: 'criss',
-  crazy: 'mad',
-  talking: 'a chat',
-  talk: 'chat',
-  understand: 'overstand',
-  work: 'hustle',
-  business: 'ting',
-  team: 'crew',
-  winner: 'big chune',
-  cool: 'chill',
-  style: 'swag'
+  hello: 'wah gwaan', hi: 'wah gwaan', friend: 'fren', friends: 'frens dem',
+  you: 'yuh', your: 'yuh', are: 'a', is: 'a', am: 'mi deh', my: 'mi',
+  very: 'real', really: 'real real', what: 'wah', where: 'weh', why: 'wah mek',
+  this: 'dis', that: 'dat', with: 'wid', for: 'fi', to: 'fi', them: 'dem',
+  those: 'dem deh', going: 'gwaan', good: 'irie', great: 'mad', awesome: 'wicked',
+  amazing: 'tun up', yes: 'yeah man', no: 'nuh', do: 'duh', does: 'duh', did: 'didh',
+  "don't": 'nuh', cannot: 'cyan', can: 'can', house: 'yaad', home: 'yaad',
+  food: 'nyam', eat: 'nyam', children: 'pickney dem', child: 'pickney', girl: 'gyal',
+  boy: 'bwoy', people: 'people dem', money: 'peppa', police: 'babylon',
+  quickly: 'quick quick', now: 'now now', later: 'inna likkle while',
+  stop: 'hol up', please: 'mi beg yuh', thanks: 'respek', thank: 'respek',
+  beautiful: 'criss', crazy: 'mad', talking: 'a chat', talk: 'chat',
+  understand: 'overstand', work: 'hustle', business: 'ting', team: 'crew',
+  winner: 'big chune', cool: 'chill', style: 'swag'
 };
+
+const originalTextByNode = new WeakMap();
+let enabled = true;
 
 function preserveCase(source, target) {
   if (source.toUpperCase() === source) return target.toUpperCase();
@@ -71,48 +24,77 @@ function preserveCase(source, target) {
   return target;
 }
 
-function replaceText(text, intensity = 2) {
-  const words = Object.keys(DICTIONARY);
+function replaceTextWithTracking(text) {
   let out = text;
-  for (const w of words) {
-    if (intensity === 1 && Math.random() > 0.35) continue;
-    if (intensity === 2 && Math.random() > 0.65) continue;
-    const regex = new RegExp(`\\b${w.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}\\b`, 'gi');
-    out = out.replace(regex, (m) => preserveCase(m, DICTIONARY[w]));
+  const counts = {};
+
+  for (const [word, replacement] of Object.entries(DICTIONARY)) {
+    const regex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}\\b`, 'gi');
+    out = out.replace(regex, (match) => {
+      counts[word] = (counts[word] || 0) + 1;
+      return preserveCase(match, replacement);
+    });
   }
-  return out;
+
+  return { text: out, counts };
 }
 
-function walkAndSwap(root, intensity) {
+function mergeCounts(base, next) {
+  for (const [k, v] of Object.entries(next)) {
+    base[k] = (base[k] || 0) + v;
+  }
+  return base;
+}
+
+function getTextNodes(root) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
       const p = node.parentElement;
       if (!p) return NodeFilter.FILTER_REJECT;
-      const tag = p.tagName;
-      if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEXTAREA', 'INPUT'].includes(tag)) return NodeFilter.FILTER_REJECT;
+      if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEXTAREA', 'INPUT'].includes(p.tagName)) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
     }
   });
-
   const nodes = [];
   while (walker.nextNode()) nodes.push(walker.currentNode);
-  for (const n of nodes) {
-    n.nodeValue = replaceText(n.nodeValue, intensity);
-  }
+  return nodes;
 }
 
 function applyPatois() {
-  chrome.storage.sync.get({ enabled: true, intensity: 2 }, (cfg) => {
-    if (!cfg.enabled) return;
-    walkAndSwap(document.body, cfg.intensity);
-  });
+  if (!enabled) return;
+  const nodes = getTextNodes(document.body);
+  const tracked = {};
+
+  for (const n of nodes) {
+    if (!originalTextByNode.has(n)) originalTextByNode.set(n, n.nodeValue);
+    const result = replaceTextWithTracking(n.nodeValue);
+    n.nodeValue = result.text;
+    mergeCounts(tracked, result.counts);
+  }
+
+  if (Object.keys(tracked).length) {
+    chrome.runtime.sendMessage({ type: 'PATOIS_TRACK_CONVERSIONS', counts: tracked });
+  }
 }
 
-const observer = new MutationObserver(() => applyPatois());
+function revertPatois() {
+  const nodes = getTextNodes(document.body);
+  for (const n of nodes) {
+    const original = originalTextByNode.get(n);
+    if (typeof original === 'string') n.nodeValue = original;
+  }
+}
+
+const observer = new MutationObserver(() => {
+  if (enabled) applyPatois();
+});
 
 function init() {
-  applyPatois();
+  chrome.storage.sync.get({ enabled: true }, (cfg) => {
+    enabled = !!cfg.enabled;
+    if (enabled) applyPatois();
+  });
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
@@ -123,5 +105,12 @@ if (document.readyState === 'loading') {
 }
 
 chrome.runtime.onMessage.addListener((msg) => {
-  if (msg?.type === 'PATOIS_APPLY_NOW') applyPatois();
+  if (msg?.type === 'PATOIS_APPLY_NOW') {
+    enabled = true;
+    applyPatois();
+  }
+  if (msg?.type === 'PATOIS_REVERT_NOW') {
+    enabled = false;
+    revertPatois();
+  }
 });

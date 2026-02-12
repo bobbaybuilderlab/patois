@@ -9,18 +9,12 @@
   <body>
     <main class="card">
       <h1>🇯🇲 Patois</h1>
-      <p>Flip webpages from plain English to yard-style Patois.</p>
-      <label class="row">
-        <span>Enabled</span>
-        <input id="enabled" type="checkbox" />
-      </label>
-      <label>
-        Intensity
-        <input id="intensity" type="range" min="1" max="3" value="2" />
-      </label>
-      <p class="tiny">1 = light, 3 = nuff slang</p>
-      <button id="applyNow">Apply on this tab</button>
-      <p id="status"></p>
+      <p>Convert this tab to Patois, or switch it back to normal English.</p>
+      <button id="toggleBtn">Convert</button>
+      <p id="status" class="tiny"></p>
+
+      <h2>Top converted words</h2>
+      <ul id="statsList" class="stats"></ul>
     </main>
     <script src="popup.js"></script>
   </body>
