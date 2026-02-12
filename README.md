@@ -4,6 +4,8 @@ Patois is a fun Chrome extension that rewrites visible English text on webpages 
 
 ## Features
 - One-button popup: Convert / Unconvert
+- Top 1000 English-word seeded dictionary
+- Converts only ~50% of eligible words to keep pages readable
 - Tracks converted words so the dictionary can expand over time
 - Exports growth suggestions as JSON (`englishWord`, `count`, `suggestedPatois`, `approved`)
 - Works on most websites via content script
@@ -21,9 +23,15 @@ Patois is a fun Chrome extension that rewrites visible English text on webpages 
 - Replaces dictionary-matched words with Patois terms
 - Observes DOM changes and reapplies where needed
 
+## Website
+- Simple marketing/docs site is included under `site/`:
+  - `site/index.html`
+  - `site/how-it-works.html`
+  - `site/privacy.html`
+
 ## Notes
 - This is intentionally playful, not linguistically complete.
-- For edge cases (apps with heavy virtual DOM), click **Apply on this tab** from popup.
+- For edge cases (apps with heavy virtual DOM), toggle convert/unconvert once from popup.
 
 ## Roadmap
 - Per-site allow/block list

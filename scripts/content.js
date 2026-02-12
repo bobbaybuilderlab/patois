@@ -1,22 +1,10 @@
-const DICTIONARY = {
-  hello: 'wah gwaan', hi: 'wah gwaan', friend: 'fren', friends: 'frens dem',
-  you: 'yuh', your: 'yuh', are: 'a', is: 'a', am: 'mi deh', my: 'mi',
-  very: 'real', really: 'real real', what: 'wah', where: 'weh', why: 'wah mek',
-  this: 'dis', that: 'dat', with: 'wid', for: 'fi', to: 'fi', them: 'dem',
-  those: 'dem deh', going: 'gwaan', good: 'irie', great: 'mad', awesome: 'wicked',
-  amazing: 'tun up', yes: 'yeah man', no: 'nuh', do: 'duh', does: 'duh', did: 'didh',
-  "don't": 'nuh', cannot: 'cyan', can: 'can', house: 'yaad', home: 'yaad',
-  food: 'nyam', eat: 'nyam', children: 'pickney dem', child: 'pickney', girl: 'gyal',
-  boy: 'bwoy', people: 'people dem', money: 'peppa', police: 'babylon',
-  quickly: 'quick quick', now: 'now now', later: 'inna likkle while',
-  stop: 'hol up', please: 'mi beg yuh', thanks: 'respek', thank: 'respek',
-  beautiful: 'criss', crazy: 'mad', talking: 'a chat', talk: 'chat',
-  understand: 'overstand', work: 'hustle', business: 'ting', team: 'crew',
-  winner: 'big chune', cool: 'chill', style: 'swag'
-};
+const DICTIONARY = (typeof TOP_1000_ENGLISH_TO_PATOIS !== 'undefined' && TOP_1000_ENGLISH_TO_PATOIS)
+  ? TOP_1000_ENGLISH_TO_PATOIS
+  : {};
 
 const originalTextByNode = new WeakMap();
 let enabled = true;
+const CONVERSION_RATIO = 0.5; // convert only ~50% of eligible matches
 
 function preserveCase(source, target) {
   if (source.toUpperCase() === source) return target.toUpperCase();
@@ -29,8 +17,10 @@ function replaceTextWithTracking(text) {
   const counts = {};
 
   for (const [word, replacement] of Object.entries(DICTIONARY)) {
+    if (!replacement || replacement === word) continue;
     const regex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}\\b`, 'gi');
     out = out.replace(regex, (match) => {
+      if (Math.random() > CONVERSION_RATIO) return match;
       counts[word] = (counts[word] || 0) + 1;
       return preserveCase(match, replacement);
     });
@@ -40,9 +30,7 @@ function replaceTextWithTracking(text) {
 }
 
 function mergeCounts(base, next) {
-  for (const [k, v] of Object.entries(next)) {
-    base[k] = (base[k] || 0) + v;
-  }
+  for (const [k, v] of Object.entries(next)) base[k] = (base[k] || 0) + v;
   return base;
 }
 
@@ -86,9 +74,7 @@ function revertPatois() {
   }
 }
 
-const observer = new MutationObserver(() => {
-  if (enabled) applyPatois();
-});
+const observer = new MutationObserver(() => { if (enabled) applyPatois(); });
 
 function init() {
   chrome.storage.sync.get({ enabled: true }, (cfg) => {
@@ -98,19 +84,10 @@ function init() {
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
 
 chrome.runtime.onMessage.addListener((msg) => {
-  if (msg?.type === 'PATOIS_APPLY_NOW') {
-    enabled = true;
-    applyPatois();
-  }
-  if (msg?.type === 'PATOIS_REVERT_NOW') {
-    enabled = false;
-    revertPatois();
-  }
+  if (msg?.type === 'PATOIS_APPLY_NOW') { enabled = true; applyPatois(); }
+  if (msg?.type === 'PATOIS_REVERT_NOW') { enabled = false; revertPatois(); }
 });

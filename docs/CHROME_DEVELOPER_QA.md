@@ -3,7 +3,7 @@
 Use these answers when submitting the extension.
 
 ## 1) What does your extension do?
-Patois rewrites visible English text on websites into playful Jamaican Patois-style wording using an in-browser dictionary.
+Patois rewrites visible English text on websites into playful Jamaican Patois-style wording using an in-browser dictionary (seeded with top 1000 English words). To preserve readability, it converts roughly 50% of eligible words.
 
 ## 2) Who is it for?
 People who want a fun browsing experience, language/culture enthusiasts, and creators who enjoy regional language remix tools.
